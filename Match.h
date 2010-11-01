@@ -5,6 +5,7 @@
 #include "SNPs.h"
 #include "MarkerSet.h"
 #include "Individual.h"
+#include "WindowInfo.h"
 #include "math.h"
 #include <iomanip>
 

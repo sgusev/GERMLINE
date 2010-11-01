@@ -120,8 +120,34 @@ bool Match::isHom( int n , unsigned int ms )
 void Match::print( ostream& fout )
 {
 	// extend this match from both ends
-	unsigned int snp_start = ALL_SNPS.getROIStart().getMarkerNumber() + start_ms * MARKER_SET_SIZE;
-	unsigned int snp_end = ALL_SNPS.getROIStart().getMarkerNumber() + ( end_ms + 1 ) * MARKER_SET_SIZE - 1;
+	unsigned int snp_start=0, snp_end=0;
+	if(VAR_WINDOW) 
+	{		
+		if(start_ms == 0) 
+			snp_start = WINDOWS_LIST.front()->getStart();
+		else if(start_ms == WINDOWS_LIST.size() -1 ) 
+			snp_start = WINDOWS_LIST.back()->getStart();
+		else {
+			list<WindowInfo*>::iterator it;	unsigned int i;
+			for( it = WINDOWS_LIST.begin(),i=0;  i< start_ms ; i++, it++);
+			snp_start = ((WindowInfo*)*it)->getStart();
+		}
+		if (end_ms ==0 ) 
+			snp_end = WINDOWS_LIST.front()->getEnd() -1;
+		else if(end_ms == WINDOWS_LIST.size() -1 ) 
+			snp_end = WINDOWS_LIST.back()->getEnd() -1;
+		else {
+			list<WindowInfo*>::iterator it;	unsigned int i;
+			for( i=0, it = WINDOWS_LIST.begin();i<end_ms;i++,it++);
+			snp_end = (((WindowInfo*)*it)->getEnd())-1;	
+		}		
+	}
+	else
+	{
+		snp_start= ALL_SNPS.getROIStart().getMarkerNumber() + start_ms * MARKER_SET_SIZE;
+		snp_end = ALL_SNPS.getROIStart().getMarkerNumber() + ( end_ms + 1 ) * MARKER_SET_SIZE - 1;
+	}
+
 	int marker;
 
 	

@@ -163,4 +163,20 @@ void HMIndividualsExtractor::getCompleteMarkerSet(Individual * p)
 	stream_phased.clear();
 }
 
+
+
+void HMIndividualsExtractor::updateMarkerSet(Individual * p,unsigned int start,unsigned int end)
+{
+	// Read as many marker sets as var_window., remove them from init_h and add in h chromosome 
+	//for(int i = start; i< end ; i++)
+	//{
+///		p->updateMarkerSet();
+//	}
+		
+	// update window_list
+	//p->updateWindowList(start,end);
+
+}
+
+
 // end HMIndividualsExtractor.cpp

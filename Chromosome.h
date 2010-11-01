@@ -3,6 +3,7 @@
 #ifndef CHROMOSOME_H
 #define CHROMOSOME_H
 
+
 #include "BasicDefinitions.h"
 #include "MarkerSet.h"
 #include <vector>
@@ -30,15 +31,29 @@ public:
 	// Postcondition: If chromosome does not yet have maxSets MarkerSet objects, 
 	//  then ms is added to the end of chromosome; otherwise a warning is printed.
 	void addMarkerSet(MarkerSet * ms);
+	// addMarkers() : loads the entire marker data into a buffer chromosome
+	void addMarkers(list<bool>* markers);
+
 	void clear();
+	//void initialize();
 
 	void print(ostream& out,unsigned int,unsigned int);
 	void print_snps(ostream& out, unsigned int, unsigned int);
+
+
+	///////////////////////////////////////////////
+	void updateMarkerSet(unsigned int start, unsigned int end);
 
 private:
 
 	// Storage for chromosome MarkerSet objects
 	vector<MarkerSet * > chromosome;
+
+	//List of marker bits
+	list<bool> buffer_chromosome;
+
+	///////////////////////////////////
+	//vector<MarkerSet * > init_chromosome;
 };
 
 ostream &operator<<(ostream &fout, Chromosome&);

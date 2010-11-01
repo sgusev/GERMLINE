@@ -38,6 +38,11 @@ public:
 	void setPhased(bool);
 	bool valid();
 
+	
+	/////////////////////////////////////////////////////////////
+	virtual void updateMarkerSet(Individual *,unsigned int,unsigned int)=0;
+
+	
 protected:
 
 	// pointer to individuals
@@ -48,6 +53,7 @@ protected:
 	bool phased;
 	// stores flag for valid input
 	bool valid_flag;
+
 
 };
 

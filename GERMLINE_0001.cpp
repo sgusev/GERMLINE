@@ -1,6 +1,10 @@
 #include "GERMLINE.h"
 #include <string.h>
 
+
+bool VAR_WINDOW = false;
+unsigned int ALL_SNPS_CURRENT_SIZE=0;
+
 double MIN_MATCH_LEN = 3;
 int MARKER_SET_SIZE = 128;
 bool PRINT_MATCH_HAPS = false;
@@ -87,6 +91,8 @@ int main(int argc, char* argv[])
 	{
 		ALL_SNPS.loadGeneticDistanceMap( map );
 	}
+
+	if (!ROI && !HAPLOID) VAR_WINDOW = true;
 
 	GERMLINE germline;
     germline.mine( params );

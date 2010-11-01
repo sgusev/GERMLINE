@@ -234,6 +234,9 @@ void SNPs::processMAPFile(){
 			}
 		}
 
+		//cout<<"Process Map file size " <<full_size <<" \t SNP ID "<< cur.getSNPID();
+		//char ch = getchar();
+		
 	}
 	setGeneticDistances();
 	s.close();
@@ -241,6 +244,7 @@ void SNPs::processMAPFile(){
 
 void SNPs::addSNP( SNP& new_snp )
 {
+	
 	if( (chromosome = genome.find( new_snp.getChr() )) == genome.end() )
 	{
 		vector<SNP> v; v.push_back( new_snp );

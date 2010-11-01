@@ -32,8 +32,10 @@ void MatchFactory::hash( Individual * i )
 	if ( het == 0 || HAPLOID ) haps = 1;
 	else haps = 2;
 
-	if ( ALLOW_HOM && het <= MAX_ERR_HOM + MAX_ERR_HET ) i->assertHomozygous();
-	if ( HOM_ONLY ) return;
+	if ( ALLOW_HOM && het <= MAX_ERR_HOM + MAX_ERR_HET ) 
+		i->assertHomozygous();
+	if ( HOM_ONLY ) 
+		return;
 	
 	for ( int c = 0 ; c < haps ; c++ )
 	{

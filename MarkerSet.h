@@ -17,10 +17,12 @@ public:
 	// Precondition: None.
 	// Postcondition: all markers have been initialized to 0.
 	MarkerSet();
+	MarkerSet(bool flag);    //constructor for Non Haploid & Variable Window Sizes
 	MarkerSet(const MarkerSet&);
 
 	void clear();
 	void set( int , bool );
+	void pushback(int, bool);
 
 	void print(ostream&);
 	void print(ostream&, unsigned int, unsigned int);

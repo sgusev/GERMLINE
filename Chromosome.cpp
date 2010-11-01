@@ -31,6 +31,12 @@ void Chromosome::addMarkerSet(MarkerSet * ms)
 	chromosome.push_back(ms);
 }
 
+//overloaded addMarkerSet() : loads the entire marker data into a buffer chromosome
+void Chromosome::addMarkers(list<bool>* markers)
+{
+	buffer_chromosome = *markers;
+}
+
 void Chromosome::print_snps(ostream& out, unsigned int start, unsigned int end)
 {
 	unsigned int p_ms = position_ms;
@@ -59,4 +65,19 @@ ostream& operator<<(ostream &fout, Chromosome& c)
 	return fout;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+
+void Chromosome::updateMarkerSet(unsigned int start, unsigned int end)
+{
+	MarkerSet* ms = new MarkerSet(true); 
+	for(unsigned int i = start;  i<end; i++)
+	{
+		ms->pushback((i-start),buffer_chromosome.front());
+		buffer_chromosome.pop_front();				// future implementation for Overlapping windows needs non-modified buffer
+	}
+	
+	chromosome.push_back(ms);
+}
+
 // end Chromosome.cpp
+

@@ -17,6 +17,7 @@ using namespace std;
 
 class Individual;
 class Match;
+
 class Share
 {
 public:
@@ -28,6 +29,7 @@ private:
 	Match * createMatch(Individual * c1 , Individual * c2);
 	list< Individual * > matches;
 };
+
 
 
 class Individual
@@ -90,10 +92,16 @@ public:
 	// Postcondition: If chromosome identified by ct has room, then ms has been
 	//  added to the end of the chromosome; otherwise a warning message is printed..
 	void addMarkerSet(int, MarkerSet * ms);
+	// addMarkers(): loads all markerbits in the buffer chromosome of an individual
+	void addMarkers(int ct, list<bool>* markers);
 
 	// clearMarkers(): clears all MarkerSets from this individual
 	void clearMarkers();
+//	void initialize();
 
+	////////////////////////////////////////////////////////////////////////////////
+	void updateMarkerSet(unsigned int start, unsigned int end);
+	
 private:
 
 	// ID of the individual
@@ -105,6 +113,7 @@ private:
 	streamoff offset;
 	
 	Match ** all_matches;
+
 };
 
 

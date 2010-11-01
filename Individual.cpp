@@ -19,7 +19,8 @@ Individual::~Individual()
 void Individual::freeMatches()
 {
 	for ( size_t iter = 0 ; iter < num_samples ; iter++ )
-		if ( all_matches[ iter ] != NULL ) deleteMatch( iter );
+		if ( all_matches[ iter ] != NULL )
+			deleteMatch( iter );
 }
 
 Match * Individual::getMatch( size_t id )
@@ -180,6 +181,12 @@ void Individual::addMarkerSet(int ct, MarkerSet * ms)
 	h[ct].addMarkerSet(ms);
 }
 
+void Individual::addMarkers(int ct, list<bool>* markers)
+{
+	if ( HAPLOID ) ct = 0;
+	h[ct].addMarkers(markers);
+}
+
 // operator<<(): overloaded stream insertion operator
 ostream& operator<<(ostream &fout, Individual& ind)
 {
@@ -189,5 +196,17 @@ ostream& operator<<(ostream &fout, Individual& ind)
 	return fout;
 }
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// updateMarkerSet() : removes markersets from buffer init_chromosome and inserts into chromosome
+void Individual::updateMarkerSet(unsigned int start, unsigned int end)
+{
+	if( !HAPLOID)
+	{
+		h[0].updateMarkerSet(start,end);
+		h[1].updateMarkerSet(start,end);
+	}
+}
 
 // end Individual.cpp

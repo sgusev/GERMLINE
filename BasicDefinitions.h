@@ -7,6 +7,8 @@
 #include <fstream>
 #include <iostream>
 #include <string.h>
+#include <list>
+
 
 using namespace std;
 
@@ -15,9 +17,16 @@ extern unsigned int position_ms;
 extern unsigned int num_sets;
 extern size_t num_samples;
 
+
 extern unsigned long num_matches;
 
 // parameters
+
+extern bool VAR_WINDOW;
+extern unsigned int ALL_SNPS_CURRENT_SIZE;
+
+
+
 extern double MIN_MATCH_LEN;
 extern int MARKER_SET_SIZE;
 extern int MAX_ERR_HOM;
@@ -35,9 +44,11 @@ extern bool BINARY_OUT;
 
 class SNPs;
 class Individuals;
+class WindowInfo;
 extern SNPs ALL_SNPS;
 extern Individuals ALL_SAMPLES;
 extern ofstream MATCH_FILE;
+extern list<WindowInfo*> WINDOWS_LIST;
 
 enum ErrorType{RECOMB=0,MI=1};
 const int HET=2;

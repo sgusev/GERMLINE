@@ -7,6 +7,7 @@
 #include "Individuals.h"
 #include "MatchFactory.h"
 #include "PolymorphicIndividualsExtractor.h"
+#include "WindowInfo.h"
 #include <sstream>
 #include <iostream>
 
@@ -48,7 +49,7 @@ private:
 	//   matches for individuals considering markers in marker set markerSetPosition, 
 	//   extending existing matches whenever possible.
 	void matchMarkerSet();
-	void readMarkerSet();
+	void readMarkerSet(unsigned int , unsigned int );
 	void readHaploidMarkerSet();
 
 	// pointer to individuals

@@ -23,12 +23,18 @@ public:
 	void loadInput();
 	void getCompleteMarkerSet(Individual * p);
 	void getCompleteMarkerSet(Individual * p0 , Individual * p1 );
+
+	//////////////////////////////////////////////////////////////////////////////////
+	void loadCompleteMarkerSet(Individual * p);    
+	void updateMarkerSet(Individual * p,unsigned int start,unsigned int end);
+
 private:
 
 	// getIndividuals(FamilyType ft): runs specific Individuals parser based on ft
 	// Precondition: "ft" is set to a valid FamilyType (matches file input)
 	// Postcondition: correct get method is run for family type
-    void getIndividuals();
+    
+	//void getIndividuals();
 	void stripWhitespace();
 	void readMarkerSet( MarkerSet ** );
 
@@ -41,6 +47,12 @@ private:
 
 	// holds map of nucleotides to binary/quad values
 	NucleotideMap inp;
+
+	///////////////////////////////////////////////////////////////////////////////////
+	void loadIndividuals();		//should change name convention to loadIndividuals()
+	void loadMarkerSet( MarkerSet ** );          
+	
+
 };
 
 #endif
