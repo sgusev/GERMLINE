@@ -24,7 +24,7 @@ void GERMLINE::mine( string params )
 	PolymorphicIndividualsExtractor * pie = inputManager.getPie();
 	inputManager.getIndividuals();
 	if ( ! pie->valid() ) return;
-	string out = "D:\\Project-Germline\\GermLine\\Debug\\test\\test";   //string out = inputManager.getOutput();  
+	string out = inputManager.getOutput(); 
 	num_samples = 0;						
 	num_matches = 0;
 
