@@ -10,7 +10,7 @@ MarkerSet::MarkerSet()
 {
 	markers.resize(MARKER_SET_SIZE);
 }
-// constructor for new implementation for Non Haploid & Variable Window Sizes
+// constructor for new implementation for Variable Window Sizes
 MarkerSet::MarkerSet(bool flag)
 {
 	
@@ -40,7 +40,7 @@ bool MarkerSet::getMarker(int index) const
 }
 
 // have a push back instead of set.... 
-void MarkerSet::pushback(int index, bool bit)
+void MarkerSet::pushback(bool bit)
 {
 	markers.push_back(bit);
 }
@@ -50,7 +50,7 @@ void MarkerSet::set(int index , bool bit )
 	markers.set( index , bit );
 }
 
-//update this for variable window size.
+//TODO: update to use WIndowSize instead of MARKER_SET_SIZE
 void MarkerSet::print(ostream& out, unsigned int start, unsigned int end)
 {
 	for(unsigned int i=start;i<end && (position_ms*MARKER_SET_SIZE)+i < ALL_SNPS.currentSize();i++)
@@ -59,7 +59,7 @@ void MarkerSet::print(ostream& out, unsigned int start, unsigned int end)
 	}
 }
 
-//update this for variable window
+//TODO: update to use WIndowSize instead of MARKER_SET_SIZE
 void MarkerSet::print(ostream& out)
 {
 	print( out , 0 , MARKER_SET_SIZE);
@@ -78,7 +78,7 @@ int MarkerSet::diff(MarkerSet * ms) const
 }
 
 
-//update this for variable window
+//TODO: update to use WIndowSize instead of MARKER_SET_SIZE
 // operator<<:overloaded insertion operator
 ostream& operator<<(ostream& fout, const MarkerSet& m1)
 {

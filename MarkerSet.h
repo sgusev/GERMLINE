@@ -22,7 +22,7 @@ public:
 
 	void clear();
 	void set( int , bool );
-	void pushback(int, bool);
+	void pushback(bool);
 
 	void print(ostream&);
 	void print(ostream&, unsigned int, unsigned int);

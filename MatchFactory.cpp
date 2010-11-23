@@ -32,8 +32,15 @@ void MatchFactory::hash( Individual * i )
 	if ( het == 0 || HAPLOID ) haps = 1;
 	else haps = 2;
 
-	if ( ALLOW_HOM && het <= MAX_ERR_HOM + MAX_ERR_HET ) 
-		i->assertHomozygous();
+	if(VAR_WINDOW)
+	{
+		if ( ALLOW_HOM && het <= WINDOWS_LIST.err_hom(position_ms) + WINDOWS_LIST.err_het(position_ms) ) 
+		i->assertHomozygous();}
+	else
+	{
+		if ( ALLOW_HOM && het <= MAX_ERR_HOM + MAX_ERR_HET ) 
+		i->assertHomozygous();}
+
 	if ( HOM_ONLY ) 
 		return;
 	
@@ -46,5 +53,28 @@ void MatchFactory::hash( Individual * i )
 			iter->second.add( i );
 	}
 }
+
+
+unsigned int MatchFactory::calculateMem()
+{
+  unsigned int mem=0, temp=0;
+  map < boost::dynamic_bitset<> , Share >::iterator it;
+  cout<<"\nposition_ms= "<<position_ms<<"\t"<<"segments= "<<segments.size()<<"\twindow size= "<<segments.begin()->first.size();
+  
+  for( it=segments.begin(); it!=segments.end(); ++it)
+	  temp += (Nchoose2(it->second.size()) * sizeof(Match)) ;
+  
+  mem+=temp;
+  cout<<"-- "<<mem<<" bytes";
+  return mem;
+}
+
+unsigned int MatchFactory::Nchoose2(unsigned int num)
+{
+	if (num<2) return 0;
+	else return num* (num-1) / 2;
+}
+
+
 
 // end MatchFactory.cpp

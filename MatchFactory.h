@@ -31,6 +31,10 @@ public:
 	void hash(Individual *);
 	void assertShares();
 
+	unsigned int calculateMem();
+
+	unsigned int Nchoose2(unsigned int);
+
 private:
 
 	// stores data to check for matches

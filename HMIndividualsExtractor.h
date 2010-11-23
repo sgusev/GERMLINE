@@ -29,6 +29,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////
 	void updateMarkerSet(Individual * p,unsigned int start,unsigned int end);
+	void updateMarkerSet(Individual * p,int );
 private:
 
     void getIndividuals();

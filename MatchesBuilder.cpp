@@ -1,13 +1,13 @@
 // MatchesBuilder.cpp: builds matches from individuals
 
 #include "MatchesBuilder.h"
-#include "list"
+#include <math.h>
 
 using namespace std;
 
 unsigned int position_ms;
 unsigned int num_sets;
-list<WindowInfo*> WINDOWS_LIST;
+WindowsList WINDOWS_LIST;
 int ALLOWED_MASKED;
 
 
@@ -21,38 +21,26 @@ MatchesBuilder::MatchesBuilder( PolymorphicIndividualsExtractor * pie )
 // buildMatches(): builds matches from individuals
 void MatchesBuilder::buildMatches()
 {
-	if(VAR_WINDOW)   // generate window sizes in the range 100 to 149
+	if(VAR_WINDOW)   
 	{
-//	cout<<"\n\t\tGenerate Window Sizes ";			
-	unsigned int pos =0, r=0;
-	while (pos < ALL_SNPS_CURRENT_SIZE)
-	{   // cout <<"\nSTART position = "<<pos ;
-		if ((ALL_SNPS_CURRENT_SIZE - pos ) <= 100)  	
-		{
-			//cout<<"\tSET SIZE = "<< ALL_SNPS_CURRENT_SIZE-pos;  
-			WINDOWS_LIST.push_back(new WindowInfo(pos,ALL_SNPS_CURRENT_SIZE,ALL_SNPS_CURRENT_SIZE-pos));
-			pos+= (ALL_SNPS_CURRENT_SIZE-pos);  
-		}
-		else 
-		{
-			r= (unsigned int) (rand() % 50 +100); 
-			//cout<<"\tSET SIZE = "<< r; 
-			WINDOWS_LIST.push_back(new WindowInfo(pos,pos+r,r));
-			pos+= r; 			
-		}
-		num_sets++;// cout <<"\tEND position = "<<pos ;
+		cout<<"\nInside BUILDMATCHES :: VARWINDOW "; _flushall();
+		char ch = getchar();
+
+		WINDOWS_LIST.initialize(ALL_SNPS_CURRENT_SIZE);
+		position_ms = -1;
+		do {
+			readMatchMarkerSet(); 
+		}while(WINDOWS_LIST.getWindowEnd() != ALL_SNPS_CURRENT_SIZE);
 	}
-	cout<<"\n\t\tNum of Sets : "<<num_sets;
-	_flushall();
-	cin.get();
-	}
+	else
+	{
 	if ( !SILENT ) cout << "Read Markers" << endl;
 	ms_start = 0; ms_end = num_sets;
 	readAllMarkers();
 
 	if ( !SILENT ) cout << "Match Markers" << endl;
 	matchAllMarkers();
-
+	}
 }
 
 void MatchesBuilder::printHaplotypes(string fout_name)
@@ -69,7 +57,7 @@ void MatchesBuilder::printHaplotypes(string fout_name)
 // matchAllMarkers(): builds matches for individuals considering all markers
 void MatchesBuilder::matchAllMarkers()
 {
-	for (position_ms = ms_start; position_ms < ms_end ; position_ms++)
+	for (position_ms = ms_start; position_ms < ms_end -1 ; position_ms++)
 	{
 		if ( !SILENT ) cerr << "\rMatching Markers - " << (position_ms*100) / (ms_end - 1) << "%" << flush;
 		matchMarkerSet();
@@ -78,29 +66,23 @@ void MatchesBuilder::matchAllMarkers()
 }
 
 void MatchesBuilder::readAllMarkers()
-{
-	list<WindowInfo*>::iterator wind_it ;
-	if (VAR_WINDOW) wind_it = WINDOWS_LIST.begin();
-	
+{    
 	for (position_ms = ms_start; position_ms < ms_end; position_ms++)
 	{
 		if ( !SILENT ) cerr << "\rReading Markers - " << position_ms*100/ms_end << "%" << flush;
-		if ( HAPLOID ) readHaploidMarkerSet(); 
+		if ( HAPLOID && ROI) readHaploidMarkerSet();	//HAPLOID && ROI , :TO BE OMITTED
 		else 
 		{ 
-			if (VAR_WINDOW)
-			{ 
-				readMarkerSet(((WindowInfo*)*wind_it)->getStart(), ((WindowInfo*)*wind_it)->getEnd());
-				wind_it++;
-			}
-			else readMarkerSet(0,0);
+			if (VAR_WINDOW)					//HAPLOID or DIPLOID but not ROI, TODO: include ROI 
+				readMarkerSet(WINDOWS_LIST.getWindowStart(position_ms), WINDOWS_LIST.getWindowEnd(position_ms));
+			else							//DIPLOID and ROI , :TO BE OMITTED 
+				readMarkerSet(0,0);
 		}
-
 	}
-
 	if ( !SILENT ) cerr << '\r' << "Reading Markers Complete" << endl;
 }
 
+//:TO BE OMITTED
 void MatchesBuilder::readHaploidMarkerSet()
 {
 	// Read the individuals two at a time
@@ -132,7 +114,7 @@ void MatchesBuilder::matchMarkerSet()
 	// Match:
 	for(individualsP->begin();individualsP->more();)
 		matchFactory.hash( individualsP->next() );
-
+	
 	// Verify:
 	matchFactory.assertShares();
 
@@ -141,8 +123,62 @@ void MatchesBuilder::matchMarkerSet()
 		individualsP->next()->assertShares();
 	
 	matchFactory.initialize();
-
-
 }
+
+void MatchesBuilder::readMatchMarkerSet()
+{
+	WINDOWS_LIST.getNewWindowSize(ALL_SNPS_CURRENT_SIZE);
+	
+	//Read:
+	position_ms++;
+	readMarkerSet(WINDOWS_LIST.getWindowStart(), WINDOWS_LIST.getWindowEnd());
+
+	//Match:
+	bool flag_updateWindow = true;
+	while(flag_updateWindow)
+	{
+		for(individualsP->begin();individualsP->more();)
+			matchFactory.hash( individualsP->next() );
+		
+		//Check Memory Bound:
+		if ( matchFactory.calculateMem() >= MEM_BOUND)			
+		{//If not enough memory
+			cout<<"--Mem Bound crossed ";
+			matchFactory.initialize();
+			// Update WindowSize and MarkerSet 
+			int num_markers = WINDOWS_LIST.updateWindowSize(ALL_SNPS_CURRENT_SIZE);
+			if(num_markers == 0 )	// reached end of total markers - no hashing
+			{ position_ms--; return; }
+			updateMarkerSet(num_markers);
+			
+		}
+		else flag_updateWindow=false;
+	}
+
+	//Verify:
+
+	matchFactory.assertShares();
+
+	// Extend:
+	for(individualsP->begin();individualsP->more();)
+		individualsP->next()->assertShares();
+	
+	matchFactory.initialize();
+
+	/*_flushall();
+	char ch = getchar();*/
+	
+}
+
+void MatchesBuilder::updateMarkerSet(int num_markers)
+{
+	Individual * i;
+	for(individualsP->begin();individualsP->more();)
+	{
+		i = individualsP->next();
+		pieP->updateMarkerSet(i,num_markers);			
+	}
+}
+
 
 // end MatchesBuilder.cpp

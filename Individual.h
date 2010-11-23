@@ -24,7 +24,7 @@ public:
 	Share( Individual * );
 	void add(Individual * );
 	void assertMatches();
-
+	unsigned int size();
 private:
 	Match * createMatch(Individual * c1 , Individual * c2);
 	list< Individual * > matches;
@@ -101,6 +101,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////
 	void updateMarkerSet(unsigned int start, unsigned int end);
+	void updateMarkerSet(int);
 	
 private:
 

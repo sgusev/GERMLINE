@@ -43,6 +43,7 @@ public:
 
 	///////////////////////////////////////////////
 	void updateMarkerSet(unsigned int start, unsigned int end);
+	void updateMarkerSet(int );
 
 private:
 

@@ -7,7 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <string.h>
-#include <list>
+//#include <list>
 
 
 using namespace std;
@@ -17,20 +17,23 @@ extern unsigned int position_ms;
 extern unsigned int num_sets;
 extern size_t num_samples;
 
-
 extern unsigned long num_matches;
-
-// parameters
 
 extern bool VAR_WINDOW;
 extern unsigned int ALL_SNPS_CURRENT_SIZE;
+extern unsigned int MIN_WINDOW_SIZE;
+extern unsigned int MEM_BOUND;
+extern int WINDOW_FACTOR;
 
-
+// parameters
 
 extern double MIN_MATCH_LEN;
 extern int MARKER_SET_SIZE;
+extern float MAX_ERR_HOMp;
+extern float MAX_ERR_HETp;
 extern int MAX_ERR_HOM;
 extern int MAX_ERR_HET;
+
 extern bool PRINT_MATCH_HAPS;
 extern bool ROI;
 extern bool HAPLOID;
@@ -44,11 +47,11 @@ extern bool BINARY_OUT;
 
 class SNPs;
 class Individuals;
-class WindowInfo;
+class WindowsList;
 extern SNPs ALL_SNPS;
 extern Individuals ALL_SAMPLES;
 extern ofstream MATCH_FILE;
-extern list<WindowInfo*> WINDOWS_LIST;
+extern WindowsList WINDOWS_LIST;
 
 enum ErrorType{RECOMB=0,MI=1};
 const int HET=2;

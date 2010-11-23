@@ -90,6 +90,7 @@ void Individual::reserveMemory()
 	for ( size_t i = 0 ; i < num_samples ; i++ ) all_matches[ i ] = NULL;
 }
 
+//TODO: update to use WIndowSize instead of MARKER_SET_SIZE
 void Individual::print(ostream& out,long start,long end)
 {
 	short tot;
@@ -202,11 +203,23 @@ ostream& operator<<(ostream &fout, Individual& ind)
 // updateMarkerSet() : removes markersets from buffer init_chromosome and inserts into chromosome
 void Individual::updateMarkerSet(unsigned int start, unsigned int end)
 {
-	if( !HAPLOID)
+	if(HAPLOID)
+		h[0].updateMarkerSet(start,end);	
+	else
 	{
 		h[0].updateMarkerSet(start,end);
 		h[1].updateMarkerSet(start,end);
 	}
-}
 
+}
+void Individual::updateMarkerSet(int num_markers)
+{
+	if(HAPLOID)
+		h[0].updateMarkerSet(num_markers);
+	else
+	{
+		h[0].updateMarkerSet(num_markers);
+		h[1].updateMarkerSet(num_markers);
+	}
+}
 // end Individual.cpp

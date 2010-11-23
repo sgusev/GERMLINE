@@ -6,7 +6,7 @@
 #include "InputManager.h"
 #include "Individuals.h"
 #include "MatchesBuilder.h"
-#include "WindowInfo.h"
+#include "WindowsList.h"
 #include "BasicDefinitions.h"
 #include <iostream>
 #include <ctime>

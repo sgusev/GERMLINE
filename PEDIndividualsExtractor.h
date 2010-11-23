@@ -25,8 +25,9 @@ public:
 	void getCompleteMarkerSet(Individual * p0 , Individual * p1 );
 
 	//////////////////////////////////////////////////////////////////////////////////
-	void loadCompleteMarkerSet(Individual * p);    
+	void loadCompleteMarkerSet(Individual ** p);    
 	void updateMarkerSet(Individual * p,unsigned int start,unsigned int end);
+	void updateMarkerSet(Individual * p,int );
 
 private:
 

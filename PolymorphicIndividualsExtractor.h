@@ -41,6 +41,7 @@ public:
 	
 	/////////////////////////////////////////////////////////////
 	virtual void updateMarkerSet(Individual *,unsigned int,unsigned int)=0;
+	virtual void updateMarkerSet(Individual *,int)=0;
 
 	
 protected:

@@ -6,6 +6,10 @@ Share::Share( Individual * cip )
 	add( cip );
 }
 
+unsigned int Share::size()
+{
+	return matches.size();
+}
 void Share::assertMatches()
 {
 	list<Individual*>::iterator i , ii;

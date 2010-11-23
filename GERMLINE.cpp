@@ -2,7 +2,6 @@
 
 #include "GERMLINE.h"
 #include <iostream>
-#include <list>
 
 
 using namespace std;
@@ -22,14 +21,22 @@ GERMLINE::GERMLINE()
 void GERMLINE::mine( string params )
 {
 	PolymorphicIndividualsExtractor * pie = inputManager.getPie();
+	if (ROI) VAR_WINDOW = false;
 	inputManager.getIndividuals();
 	if ( ! pie->valid() ) return;
-	string out = inputManager.getOutput(); 
+	
+	//string out = "D:\\Project-Germline\\GermLine\\Debug\\test";				//for debugging
+	string out = inputManager.getOutput();  
+
 	num_samples = 0;						
 	num_matches = 0;
 
 	pie->loadInput();
 	MatchesBuilder mb( pie );
+
+//	cout<<"\nNumber of Samples - "<<num_samples;
+//	_flushall();
+//	char ch = getchar();
 
 	ofstream fout( ( out + ".log" ).c_str() );
 
@@ -50,7 +57,8 @@ void GERMLINE::mine( string params )
 	fout << params << endl;
 	fout << setw(65) << setfill('-') << ' ' << endl << setfill(' ');
 	fout << setw(50) << left << "Minimum match length: " << MIN_MATCH_LEN << " cM" << endl;
-	fout << setw(50) << "Allowed mismatching bits: " << MAX_ERR_HOM << " " << MAX_ERR_HET << endl;
+	if(VAR_WINDOW) fout << setw(50) << "Allowed mismatch: " << MAX_ERR_HOMp << "% " << MAX_ERR_HETp << "%"<<endl;
+	else fout << setw(50) << "Allowed mismatching bits: " << MAX_ERR_HOM << " " << MAX_ERR_HET << endl;
 	if (!VAR_WINDOW) fout << setw(50) << "Word size: " << MARKER_SET_SIZE << endl;
 	if ( ROI )
 		fout << setw(50) << "Target region: " << ALL_SNPS.getROIStart().getSNPID() << " - " << ALL_SNPS.getROIEnd().getSNPID() << endl;
@@ -61,6 +69,7 @@ void GERMLINE::mine( string params )
 	
 	if ( DEBUG ) cout << "DEBUG MODE ON" << endl;
 
+	//TODO: update to use Variable windows
 	if ( ROI )
 	{
 		ALL_SNPS.beginChromosome();
@@ -73,8 +82,10 @@ void GERMLINE::mine( string params )
 	{
 		for ( ALL_SNPS.beginChromosome() ; ALL_SNPS.moreChromosome() ; ALL_SNPS.nextChromosome() )
 		{
-			if (VAR_WINDOW) ALL_SNPS_CURRENT_SIZE = ALL_SNPS.currentSize();
-			else num_sets = (long)ceil((double)ALL_SNPS.currentSize()/(double)MARKER_SET_SIZE);
+			if (VAR_WINDOW)
+				ALL_SNPS_CURRENT_SIZE = ALL_SNPS.currentSize();
+			else 
+				num_sets = (long)ceil((double)ALL_SNPS.currentSize()/(double)MARKER_SET_SIZE);
 					
 			mb.buildMatches();
 		
@@ -94,7 +105,8 @@ void GERMLINE::mine( string params )
 	fout.close();
 	MATCH_FILE.close();
 
-	if ( BINARY_OUT )
+	//TODO: update to use Variable windows
+	if ( BINARY_OUT )		
 	{
 		ofstream bmid_out( ( out + ".bmid" ).c_str() );
 		ALL_SNPS.print( bmid_out );

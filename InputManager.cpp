@@ -93,9 +93,9 @@ void InputManager::invalidChoiceMessage()
 void InputManager::setFileFormat(string choice)
 {
 	if (choice[0] == '1')
-		format = PED;
+	{ format = PED; VAR_WINDOW = true;}
 	else if (choice[0] == '2')
-		format = HM;
+	{format = HM; VAR_WINDOW = false;}
 	else
 	{
 		cerr << "WARNING: InputManager::setFileFormat(): invalid file format choice"

@@ -23,6 +23,7 @@ void Chromosome::clear()
 {
 	for ( size_t i = 0 ; i < chromosome.size() ; i++ ) { delete chromosome[i]; }
 	chromosome.clear();
+	buffer_chromosome.clear();
 }
 
 // addMarkerSet(): adds a MarkerSet
@@ -37,6 +38,7 @@ void Chromosome::addMarkers(list<bool>* markers)
 	buffer_chromosome = *markers;
 }
 
+//TODO: update to use WIndowSize instead of MARKER_SET_SIZE
 void Chromosome::print_snps(ostream& out, unsigned int start, unsigned int end)
 {
 	unsigned int p_ms = position_ms;
@@ -50,6 +52,7 @@ void Chromosome::print_snps(ostream& out, unsigned int start, unsigned int end)
 	position_ms = p_ms;
 }
 
+//TODO: update to use WIndowSize instead of MARKER_SET_SIZE
 void Chromosome::print(ostream& out,unsigned int start,unsigned int end)
 {
 	for(position_ms=start;position_ms<end;position_ms++) 
@@ -59,6 +62,7 @@ void Chromosome::print(ostream& out,unsigned int start,unsigned int end)
 	}
 }
 
+//TODO: update to use WIndowSize instead of MARKER_SET_SIZE
 ostream& operator<<(ostream &fout, Chromosome& c)
 {
 	fout << c.getMarkerSet();
@@ -72,11 +76,21 @@ void Chromosome::updateMarkerSet(unsigned int start, unsigned int end)
 	MarkerSet* ms = new MarkerSet(true); 
 	for(unsigned int i = start;  i<end; i++)
 	{
-		ms->pushback((i-start),buffer_chromosome.front());
+		ms->pushback(buffer_chromosome.front());
 		buffer_chromosome.pop_front();				// future implementation for Overlapping windows needs non-modified buffer
 	}
 	
 	chromosome.push_back(ms);
+}
+void Chromosome::updateMarkerSet(int num_markers)
+{
+	while(num_markers>0)
+	{
+		chromosome.back()->pushback(buffer_chromosome.front());
+		buffer_chromosome.pop_front();	
+		num_markers--;
+	}
+
 }
 
 // end Chromosome.cpp

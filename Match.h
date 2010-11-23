@@ -5,7 +5,7 @@
 #include "SNPs.h"
 #include "MarkerSet.h"
 #include "Individual.h"
-#include "WindowInfo.h"
+#include "WindowsList.h"
 #include "math.h"
 #include <iomanip>
 
@@ -20,6 +20,7 @@ public:
 	Individual * node[2];
 	unsigned int start_ms, end_ms;
 
+	//TODO: update to use WIndowSize instead of MARKER_SET_SIZE
 	long physicalStart(){	return ALL_SNPS.getSNP(start_ms*MARKER_SET_SIZE).getPhysPos(); }
 	long physicalEnd(){		return ALL_SNPS.getSNP((end_ms+1)*MARKER_SET_SIZE-1).getPhysPos(); }
 	string chromosome(){	return ALL_SNPS.getSNP(start_ms*MARKER_SET_SIZE).getChr(); }

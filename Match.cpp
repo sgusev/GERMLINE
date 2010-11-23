@@ -27,8 +27,16 @@ bool Match::approxEqual()
 	{
 		if ( ALLOW_HOM )
 		{
+			if(VAR_WINDOW)
+			{
 			if ( (int) ( node[0]->getChromosome( 0 )->getMarkerSet()->getMarkerBits() ^ node[1]->getChromosome( 1 )->getMarkerSet()->getMarkerBits() ).count() 
+				<= ( WINDOWS_LIST.err_hom(position_ms) + WINDOWS_LIST.err_het(position_ms) ) ) return true; else return false;
+			}
+			else
+			{
+				if ( (int) ( node[0]->getChromosome( 0 )->getMarkerSet()->getMarkerBits() ^ node[1]->getChromosome( 1 )->getMarkerSet()->getMarkerBits() ).count() 
 				 <= ( MAX_ERR_HOM + MAX_ERR_HET ) ) return true; else return false;
+			}
 		}
 		else
 		{
@@ -40,15 +48,24 @@ bool Match::approxEqual()
 		// 1. Haplotype extension
 		if ( HAPLOID )
 		{
-				if ( (int)(node[0]->getChromosome( 0 )->getMarkerSet()->getMarkerBits() ^ node[1]->getChromosome( 0 )->getMarkerSet()->getMarkerBits()).count() <= MAX_ERR_HOM ) return true;
+			if(VAR_WINDOW)
+			{if ( (int)(node[0]->getChromosome( 0 )->getMarkerSet()->getMarkerBits() ^ node[1]->getChromosome( 0 )->getMarkerSet()->getMarkerBits()).count() <= WINDOWS_LIST.err_hom(position_ms) ) return true;}
+			else
+			{if ( (int)(node[0]->getChromosome( 0 )->getMarkerSet()->getMarkerBits() ^ node[1]->getChromosome( 0 )->getMarkerSet()->getMarkerBits()).count() <= MAX_ERR_HOM ) return true;}
 		} else
 		{
 			for ( int a = 0 ; a < 2 ; a++ ) {
 				for ( int b = 0 ; b < 2 ; b++ ) { 
+					if(VAR_WINDOW){
+					if ( (int)(node[0]->getChromosome( a )->getMarkerSet()->getMarkerBits() ^ node[1]->getChromosome( b )->getMarkerSet()->getMarkerBits()).count() <= WINDOWS_LIST.err_hom(position_ms) )
+					{
+						return true;
+					}}
+					else{
 					if ( (int)(node[0]->getChromosome( a )->getMarkerSet()->getMarkerBits() ^ node[1]->getChromosome( b )->getMarkerSet()->getMarkerBits()).count() <= MAX_ERR_HOM )
 					{
 						return true;
-					}
+					}}
 				}
 			}
 		}
@@ -62,13 +79,22 @@ bool Match::approxEqual()
 			& ( node[1]->getChromosome( 0 )->getMarkerSet()->getMarkerBits() ^ node[1]->getChromosome( 1 )->getMarkerSet()->getMarkerBits() ).flip();
 
 		// assert that homozygous SNPs are identical
+		if(VAR_WINDOW)
+		{
+			if ( (int) ((node[0]->getChromosome( 0 )->getMarkerSet()->getMarkerBits() ^ node[1]->getChromosome( 0 )->getMarkerSet()->getMarkerBits()) & mask).count() <= WINDOWS_LIST.err_het(position_ms) )
+		{
+			return true;
+		}else return false;}
+		else
+		{
 		if ( (int) ((node[0]->getChromosome( 0 )->getMarkerSet()->getMarkerBits() ^ node[1]->getChromosome( 0 )->getMarkerSet()->getMarkerBits()) & mask).count() <= MAX_ERR_HET )
 		{
 			return true;
-		}
-		else return false;
+		}else return false;}
+		
 	}
 }
+
 
 int Match::scanLeft( unsigned int ms )
 {
@@ -80,9 +106,15 @@ int Match::scanLeft( unsigned int ms )
 		& ( node[1]->getChromosome( 0 )->getMarkerSet(ms)->getMarkerBits() ^ node[1]->getChromosome( 1 )->getMarkerSet(ms)->getMarkerBits() ).flip();
 	mask = ( node[0]->getChromosome( 0 )->getMarkerSet(ms)->getMarkerBits() ^ node[1]->getChromosome( 0 )->getMarkerSet(ms)->getMarkerBits()) & mask;
 
-	for( marker = MARKER_SET_SIZE - 1 ; marker >= 0 && !err ; marker-- )
-		if ( mask[marker] ) err = true;
-	
+	if(VAR_WINDOW){
+		for( marker = WINDOWS_LIST.getWindowSize(ms) - 1 ; marker >= 0 && !err ; marker-- )
+			if ( mask[marker] ) err = true;
+	}
+	else{
+		for( marker = MARKER_SET_SIZE - 1 ; marker >= 0 && !err ; marker-- )
+			if ( mask[marker] ) err = true;
+	}
+
 	return marker;
 }
 
@@ -96,8 +128,14 @@ int Match::scanRight( unsigned int ms )
 		& ( node[1]->getChromosome( 0 )->getMarkerSet(ms)->getMarkerBits() ^ node[1]->getChromosome( 1 )->getMarkerSet(ms)->getMarkerBits() ).flip();
 	mask = ( node[0]->getChromosome( 0 )->getMarkerSet(ms)->getMarkerBits() ^ node[1]->getChromosome( 0 )->getMarkerSet(ms)->getMarkerBits()) & mask;
 
-	for( marker = 0 ; marker < MARKER_SET_SIZE && !err ; marker++ )
-		if ( mask[marker] ) err = true;
+	if (VAR_WINDOW){
+		for( marker = 0 ; marker < WINDOWS_LIST.getWindowSize(ms) && !err ; marker++ )
+			if ( mask[marker] ) err = true;
+	}
+	else{
+		for( marker = 0 ; marker < MARKER_SET_SIZE && !err ; marker++ )
+			if ( mask[marker] ) err = true;
+	}
 	
 	return marker;
 }
@@ -114,33 +152,22 @@ int Match::diff( unsigned int ms )
 
 bool Match::isHom( int n , unsigned int ms )
 {
+	if(VAR_WINDOW)
+	return (int) ( node[n]->getChromosome( 0 )->getMarkerSet(ms)->getMarkerBits() ^ node[n]->getChromosome( 1 )->getMarkerSet(ms)->getMarkerBits() ).count() <= ( WINDOWS_LIST.err_hom(ms) + WINDOWS_LIST.err_het(ms));
+	else
 	return (int) ( node[n]->getChromosome( 0 )->getMarkerSet(ms)->getMarkerBits() ^ node[n]->getChromosome( 1 )->getMarkerSet(ms)->getMarkerBits() ).count() <= ( MAX_ERR_HOM + MAX_ERR_HET );
 }
 
 void Match::print( ostream& fout )
 {
+	// TODO: If match length + current window size < minimum match threshold, don't bother extending forward
+	
 	// extend this match from both ends
 	unsigned int snp_start=0, snp_end=0;
 	if(VAR_WINDOW) 
-	{		
-		if(start_ms == 0) 
-			snp_start = WINDOWS_LIST.front()->getStart();
-		else if(start_ms == WINDOWS_LIST.size() -1 ) 
-			snp_start = WINDOWS_LIST.back()->getStart();
-		else {
-			list<WindowInfo*>::iterator it;	unsigned int i;
-			for( it = WINDOWS_LIST.begin(),i=0;  i< start_ms ; i++, it++);
-			snp_start = ((WindowInfo*)*it)->getStart();
-		}
-		if (end_ms ==0 ) 
-			snp_end = WINDOWS_LIST.front()->getEnd() -1;
-		else if(end_ms == WINDOWS_LIST.size() -1 ) 
-			snp_end = WINDOWS_LIST.back()->getEnd() -1;
-		else {
-			list<WindowInfo*>::iterator it;	unsigned int i;
-			for( i=0, it = WINDOWS_LIST.begin();i<end_ms;i++,it++);
-			snp_end = (((WindowInfo*)*it)->getEnd())-1;	
-		}		
+	{	
+		snp_start = WINDOWS_LIST.getWindowStart(start_ms);
+		snp_end = WINDOWS_LIST.getWindowEnd(end_ms) -1;		
 	}
 	else
 	{
@@ -150,23 +177,26 @@ void Match::print( ostream& fout )
 
 	int marker;
 
-	
-	if ( WIN_EXT )
+	if ( WIN_EXT )								//fixed for VAR_WINDOW
 	{
 		// backwards
 		if( start_ms > 0 )
 		{
 			marker = scanLeft( start_ms - 1 );
-			snp_start -= (MARKER_SET_SIZE - marker - 2);
+			if(VAR_WINDOW)
+				snp_start -= (WINDOWS_LIST.getWindowSize(start_ms) - marker - 2);		//Check this ?
+			else
+				snp_start -= (MARKER_SET_SIZE - marker - 2);
 		}
 	}
-	if ( WIN_EXT || end_ms == num_sets - 2 )
+	if ( WIN_EXT || end_ms == num_sets - 2 )	//fixed for VAR_WINDOW
 	{
 		// forwards
 		if( end_ms < num_sets - 1 )
 		{
 			marker = scanRight( end_ms + 1 );
-			snp_end += marker - 1;
+			snp_end += marker;
+
 		}
 	}
 	

@@ -4,6 +4,9 @@
 
 bool VAR_WINDOW = false;
 unsigned int ALL_SNPS_CURRENT_SIZE=0;
+unsigned int MIN_WINDOW_SIZE = 50;
+unsigned int MEM_BOUND = 500;				// in bytes
+int WINDOW_FACTOR = 1;						//factor (in markers) by which a window length is increased when mem bound is crossed
 
 double MIN_MATCH_LEN = 3;
 int MARKER_SET_SIZE = 128;
@@ -17,6 +20,8 @@ bool HAPLOID = false;
 bool SILENT = false;
 bool DEBUG = false;
 bool BINARY_OUT = false;
+float MAX_ERR_HOMp = 5.0;				//default 5 %
+float MAX_ERR_HETp = 5.0;				//default 3 %
 int MAX_ERR_HOM = 4;
 int MAX_ERR_HET = 1;
 
@@ -31,23 +36,29 @@ int main(int argc, char* argv[])
 	for(int i=1;i<argc;i++){
 		params += " " + string(argv[i]);
 		if( strncmp(argv[i], "-min_m", strlen("-min_m")) == 0 && i < argc-1)				MIN_MATCH_LEN = atof(argv[++i]);
-		else if( strncmp(argv[i], "-err_hom", strlen("-max_err")) == 0 && i < argc-1)		{ MAX_ERR_HOM = atoi(argv[++i]); }
-		else if( strncmp(argv[i], "-err_het", strlen("-max_err")) == 0 && i < argc-1)		{ MAX_ERR_HET = atoi(argv[++i]); }
+		else if( strncmp(argv[i], "-err_hom", strlen("-err_hom")) == 0 && i < argc-1)		{ MAX_ERR_HOMp = atoi(argv[++i]); 
+																							MAX_ERR_HOM = (int) MAX_ERR_HOMp;}
+		else if( strncmp(argv[i], "-err_het", strlen("-err_het")) == 0 && i < argc-1)		{ MAX_ERR_HETp = atoi(argv[++i]); 
+																							MAX_ERR_HET = (int) MAX_ERR_HETp;}
 		else if( strncmp(argv[i], "-from_snp", strlen("-from_snp")) == 0 && i < argc-1 )	rs_range[0] = argv[++i];
 		else if( strncmp(argv[i], "-to_snp", strlen("-to_snp")) == 0 && i < argc-1 )		rs_range[1] = argv[++i];
 		else if( strncmp(argv[i], "-print", strlen("-print")) == 0 )						PRINT_MATCH_HAPS = true;
 		else if( strncmp(argv[i], "-silent", strlen("-silent")) == 0 )						SILENT = true;
 		else if( strncmp(argv[i], "-debug", strlen("-debug")) == 0 )						DEBUG = true;
 		else if( strncmp(argv[i], "-map", strlen("-map")) == 0 && i < argc-1)				map = argv[++i];
-		else if( strncmp(argv[i], "-bits", strlen("-bits")) == 0 && i < argc-1)				MARKER_SET_SIZE = atoi(argv[++i]);
+		else if( strncmp(argv[i], "-bits", strlen("-bits")) == 0 && i < argc-1)				{MARKER_SET_SIZE = atoi(argv[++i]);
+																							MIN_WINDOW_SIZE=MARKER_SET_SIZE;}
 		else if( strncmp(argv[i], "-homoz-only", strlen("-homoz-only")) == 0 )				{ ALLOW_HOM = true; HOM_ONLY = true; }
 		else if( strncmp(argv[i], "-homoz", strlen("-homoz")) == 0 )						ALLOW_HOM = true;
 		else if( strncmp(argv[i], "-bin_out", strlen("-bin_out")) == 0 )						BINARY_OUT = true;
 		else if( strncmp(argv[i], "-haploid", strlen("-haploid")) == 0 )					{ HAPLOID = true; HAP_EXT = true; }
 		else if( strncmp(argv[i], "-h_extend", strlen("-h_extend")) == 0 )					HAP_EXT = true;
 		else if( strncmp(argv[i], "-w_extend", strlen("-w_extend")) == 0 )					WIN_EXT = true;
+		else if( strncmp(argv[i], "-membound", strlen("-membound")) == 0 && i < argc-1)		MEM_BOUND = atoi(argv[++i]);
 		else bad_param = true;
 	}
+	
+	//HAPLOID = true; HAP_EXT = true;		//st flags to test HAPLOID
 
 	if(MIN_MATCH_LEN < 0)
 	{
@@ -92,7 +103,8 @@ int main(int argc, char* argv[])
 		ALL_SNPS.loadGeneticDistanceMap( map );
 	}
 
-	if (!ROI && !HAPLOID) VAR_WINDOW = true;
+	// use variable window sizes
+	if (ROI) VAR_WINDOW = false;
 
 	GERMLINE germline;
     germline.mine( params );
