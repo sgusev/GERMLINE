@@ -25,7 +25,7 @@ void GERMLINE::mine( string params )
 	inputManager.getIndividuals();
 	if ( ! pie->valid() ) return;
 	
-	//string out = "D:\\Project-Germline\\GermLine\\Debug\\test";				//for debugging
+	//string out = "D:\\Project-Germline\\GermLine\\Debug\\variable";					//for debugging
 	string out = inputManager.getOutput();  
 
 	num_samples = 0;						
@@ -33,10 +33,6 @@ void GERMLINE::mine( string params )
 
 	pie->loadInput();
 	MatchesBuilder mb( pie );
-
-//	cout<<"\nNumber of Samples - "<<num_samples;
-//	_flushall();
-//	char ch = getchar();
 
 	ofstream fout( ( out + ".log" ).c_str() );
 

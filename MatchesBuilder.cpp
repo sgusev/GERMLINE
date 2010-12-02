@@ -23,9 +23,6 @@ void MatchesBuilder::buildMatches()
 {
 	if(VAR_WINDOW)   
 	{
-		cout<<"\nInside BUILDMATCHES :: VARWINDOW "; _flushall();
-		char ch = getchar();
-
 		WINDOWS_LIST.initialize(ALL_SNPS_CURRENT_SIZE);
 		position_ms = -1;
 		do {
