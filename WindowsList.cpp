@@ -77,4 +77,5 @@ int WindowsList::err_hom(unsigned int ms)
 int WindowsList::err_het(unsigned int ms)
 {	return (int) floor(getWindowSize(ms)*MAX_ERR_HETp/100);}
 
+
 //end WindowsList.cpp

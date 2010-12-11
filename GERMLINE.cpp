@@ -24,8 +24,10 @@ void GERMLINE::mine( string params )
 	if (ROI) VAR_WINDOW = false;
 	inputManager.getIndividuals();
 	if ( ! pie->valid() ) return;
+
+	//cout<<"MeM_BOUND = "<<MEM_BOUND<<endl;
 	
-	//string out = "D:\\Project-Germline\\GermLine\\Debug\\variable";					//for debugging
+	//string out = "D:\\ColumbiaUniversity\\Project-Germline\\commit3.1\\GERMLINE\\test\\test_fixed_30_tweak";
 	string out = inputManager.getOutput();  
 
 	num_samples = 0;						
@@ -33,6 +35,8 @@ void GERMLINE::mine( string params )
 
 	pie->loadInput();
 	MatchesBuilder mb( pie );
+
+	
 
 	ofstream fout( ( out + ".log" ).c_str() );
 
@@ -78,13 +82,13 @@ void GERMLINE::mine( string params )
 	{
 		for ( ALL_SNPS.beginChromosome() ; ALL_SNPS.moreChromosome() ; ALL_SNPS.nextChromosome() )
 		{
-			if (VAR_WINDOW)
-				ALL_SNPS_CURRENT_SIZE = ALL_SNPS.currentSize();
-			else 
+			
+			ALL_SNPS_CURRENT_SIZE = ALL_SNPS.currentSize();
+			if (!VAR_WINDOW)
 				num_sets = (long)ceil((double)ALL_SNPS.currentSize()/(double)MARKER_SET_SIZE);
 					
 			mb.buildMatches();
-		
+			//cout<<"Num_Sets = "<<num_sets<<endl;
 			if ( !SILENT ) cout << "Matches completed ... freeing memory" << endl;
 
 			ALL_SAMPLES.freeMatches();

@@ -3,10 +3,10 @@
 #include <math.h>
 
 
-bool VAR_WINDOW = true;
+bool VAR_WINDOW = false;
 unsigned int ALL_SNPS_CURRENT_SIZE=0;
 unsigned int MIN_WINDOW_SIZE = 30;
-unsigned int MEM_BOUND = 5000000;				// in bytes
+unsigned int MEM_BOUND = 20*1024*1024;				// in bytes
 int WINDOW_FACTOR = 1;						//factor (in markers) by which a window length is increased when mem bound is crossed
 
 double MIN_MATCH_LEN = 3;
@@ -54,8 +54,8 @@ int main(int argc, char* argv[])
 		else if( strncmp(argv[i], "-haploid", strlen("-haploid")) == 0 )					{ HAPLOID = true; HAP_EXT = true; }
 		else if( strncmp(argv[i], "-h_extend", strlen("-h_extend")) == 0 )					HAP_EXT = true;
 		else if( strncmp(argv[i], "-w_extend", strlen("-w_extend")) == 0 )					WIN_EXT = true;
+		else if( strncmp(argv[i], "-varwin", strlen("-varwin")) == 0 )                                          VAR_WINDOW = true;
 		else if( strncmp(argv[i], "-membound", strlen("-membound")) == 0 && i < argc-1)		MEM_BOUND = atoi(argv[++i])*1024*1024;
-		else if( strncmp(argv[i], "-varwin", strlen("-varwin")) == 0 )						VAR_WINDOW = true;
 		else bad_param = true;
 	}
 	

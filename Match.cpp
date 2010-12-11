@@ -111,8 +111,10 @@ int Match::scanLeft( unsigned int ms )
 			if ( mask[marker] ) err = true;
 	}
 	else{
+		
 		for( marker = MARKER_SET_SIZE - 1 ; marker >= 0 && !err ; marker-- )
 			if ( mask[marker] ) err = true;
+		
 	}
 
 	return marker;
@@ -129,12 +131,22 @@ int Match::scanRight( unsigned int ms )
 	mask = ( node[0]->getChromosome( 0 )->getMarkerSet(ms)->getMarkerBits() ^ node[1]->getChromosome( 0 )->getMarkerSet(ms)->getMarkerBits()) & mask;
 
 	if (VAR_WINDOW){
+		
 		for( marker = 0 ; marker < WINDOWS_LIST.getWindowSize(ms) && !err ; marker++ )
 			if ( mask[marker] ) err = true;
 	}
 	else{
+		if (ms == num_sets-1)
+		{
+			int size = ALL_SNPS_CURRENT_SIZE - ((num_sets-1)*MARKER_SET_SIZE);
+			for( marker = 0 ; marker < size && !err ; marker++ )
+				if ( mask[marker] ) err = true;
+		}
+		else
+		{
 		for( marker = 0 ; marker < MARKER_SET_SIZE && !err ; marker++ )
 			if ( mask[marker] ) err = true;
+		}
 	}
 	
 	return marker;

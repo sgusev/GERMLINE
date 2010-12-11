@@ -51,8 +51,9 @@ void PEDIndividualsExtractor::getInput()
 	cout << "Please enter the PED file name" << endl;
 	cin >> ped_file;
 	
-	//map_file = "D:\\Project-Germline\\GermLine\\Debug\\CEU.map";		//for debugging
-	//ped_file = "D:\\Project-Germline\\GermLine\\Debug\\CEU.ped";		//for debugging
+	
+	//map_file = "D:\\ColumbiaUniversity\\Project-Germline\\commit3.1\\GERMLINE\\test\\CEU.map"; //for debugging
+	//ped_file = "D:\\ColumbiaUniversity\\Project-Germline\\commit3.1\\GERMLINE\\test\\CEU.ped";  //for debugging
 
 	if ( !ALL_SNPS.setFile( map_file ) )
 	{

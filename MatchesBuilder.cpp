@@ -130,6 +130,7 @@ void MatchesBuilder::readMatchMarkerSet()
 	position_ms++;
 	readMarkerSet(WINDOWS_LIST.getWindowStart(), WINDOWS_LIST.getWindowEnd());
 
+
 	//Match:
 	bool flag_updateWindow = true;
 	while(flag_updateWindow)
@@ -140,12 +141,13 @@ void MatchesBuilder::readMatchMarkerSet()
 		//Check Memory Bound:
 		if ( matchFactory.calculateMem() >= MEM_BOUND)			
 		{//If not enough memory
-			cout<<"--Mem Bound crossed ";
+			//cout<<"--Mem Bound crossed ";
 			matchFactory.initialize();
 			// Update WindowSize and MarkerSet 
 			int num_markers = WINDOWS_LIST.updateWindowSize(ALL_SNPS_CURRENT_SIZE);
 			if(num_markers == 0 )	// reached end of total markers - no hashing
-			{ position_ms--; return; }
+			{ position_ms--; 
+			return; }
 			updateMarkerSet(num_markers);
 			
 		}

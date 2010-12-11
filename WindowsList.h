@@ -53,7 +53,6 @@ public:
 	void getNewWindowSize(unsigned int );
 	int updateWindowSize(unsigned int);
 
-
 private:
 	vector<WindowInfo*> windows_list;
 	vector<WindowInfo*>::iterator it ;
