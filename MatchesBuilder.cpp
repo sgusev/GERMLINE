@@ -147,6 +147,7 @@ void MatchesBuilder::readMatchMarkerSet()
 			int num_markers = WINDOWS_LIST.updateWindowSize(ALL_SNPS_CURRENT_SIZE);
 			if(num_markers == 0 )	// reached end of total markers - no hashing
 			{ position_ms--; 
+				LAST_SET=true;
 			return; }
 			updateMarkerSet(num_markers);
 			

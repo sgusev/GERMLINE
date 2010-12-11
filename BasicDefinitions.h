@@ -24,6 +24,7 @@ extern unsigned int ALL_SNPS_CURRENT_SIZE;
 extern unsigned int MIN_WINDOW_SIZE;
 extern unsigned int MEM_BOUND;
 extern int WINDOW_FACTOR;
+extern bool LAST_SET;
 
 // parameters
 

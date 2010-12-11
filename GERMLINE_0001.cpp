@@ -8,6 +8,7 @@ unsigned int ALL_SNPS_CURRENT_SIZE=0;
 unsigned int MIN_WINDOW_SIZE = 30;
 unsigned int MEM_BOUND = 20*1024*1024;				// in bytes
 int WINDOW_FACTOR = 1;						//factor (in markers) by which a window length is increased when mem bound is crossed
+bool LAST_SET=false;
 
 double MIN_MATCH_LEN = 3;
 int MARKER_SET_SIZE = 30;

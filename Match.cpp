@@ -201,7 +201,7 @@ void Match::print( ostream& fout )
 				snp_start -= (MARKER_SET_SIZE - marker - 2);
 		}
 	}
-	if ( WIN_EXT || end_ms == num_sets - 2 )	//fixed for VAR_WINDOW
+	if (( LAST_SET && end_ms == num_sets - 2 ) || WIN_EXT)	//fixed for VAR_WINDOW
 	{
 		// forwards
 		if( end_ms < num_sets - 1 )
