@@ -17,6 +17,7 @@ public:
 	// Precondition: None.
 	// Postcondition: chromosome is empty. maxSets is 0.
 	Chromosome();
+	~Chromosome();
 	
 	// getMarkerSet(): accessor for MarkerSet objects.
 	// Precondition: None.
@@ -32,7 +33,7 @@ public:
 	//  then ms is added to the end of chromosome; otherwise a warning is printed.
 	void addMarkerSet(MarkerSet * ms);
 	// addMarkers() : loads the entire marker data into a buffer chromosome
-	void addMarkers(list<bool>* markers);
+	void addMarkers(vector<bool>* markers);
 
 	void clear();
 	//void initialize();
@@ -42,19 +43,16 @@ public:
 
 
 	///////////////////////////////////////////////
-	void updateMarkerSet(unsigned int start, unsigned int end);
-	void updateMarkerSet(int );
+	void updateMarkerSet(unsigned int , unsigned int );
+	void appendMarkerSet(unsigned int ,int );
 
 private:
 
 	// Storage for chromosome MarkerSet objects
 	vector<MarkerSet * > chromosome;
 
-	//List of marker bits
-	list<bool> buffer_chromosome;
-
-	///////////////////////////////////
-	//vector<MarkerSet * > init_chromosome;
+	//Bitset of marker bits
+	vector<bool> buffer_chromosome;
 };
 
 ostream &operator<<(ostream &fout, Chromosome&);

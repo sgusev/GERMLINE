@@ -30,7 +30,7 @@ public:
 
 	void printAllMatches();
 	void printHaplotypes(string);
-
+	unsigned long long calculateMemData();
 private:
 
 	// matchAllMarkers(): builds matches for individuals considering all markers.
@@ -49,7 +49,7 @@ private:
 	//   matches for individuals considering markers in marker set markerSetPosition, 
 	//   extending existing matches whenever possible.
 	void matchMarkerSet();
-	void updateMarkerSet(int);
+	void appendMarkerSet(unsigned int, int);
 	void readMarkerSet(unsigned int , unsigned int );
 	void readHaploidMarkerSet();
 	void readMatchMarkerSet();

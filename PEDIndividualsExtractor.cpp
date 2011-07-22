@@ -30,38 +30,35 @@ void PEDIndividualsExtractor::loadInput()
 	ALL_SNPS.processMAPFile();
 	ALL_SNPS.beginChromosome();
 	numberOfMarkers = ALL_SNPS.size();	
-		
 	while (!stream.eof() )
 	{
 		loadIndividuals();  
-		if (VAR_WINDOW) stream.seekg(1,ios::cur);
-		else stream.seekg(numberOfMarkers*4 + 1,ios::cur); 
+		stream.seekg(4*(numberOfMarkers-ALL_SNPS.getROIEnd().getMarkerNumber() -1)+1,ios::cur);
 	}
-	individualsP->initialize();
 	stream.clear();
-	
 }
 
 // getInput(): gets individuals from .ped file
-void PEDIndividualsExtractor::getInput()
+void PEDIndividualsExtractor::getInput(string map, string ped)
 {
-		
-	cout << "Please enter the MAP file name" << endl;
-	cin >> map_file;
-	cout << "Please enter the PED file name" << endl;
-	cin >> ped_file;
-	
-	
-	//map_file = "D:\\ColumbiaUniversity\\Project-Germline\\commit3.1\\GERMLINE\\test\\CEU.map"; //for debugging
-	//ped_file = "D:\\ColumbiaUniversity\\Project-Germline\\commit3.1\\GERMLINE\\test\\CEU.ped";  //for debugging
-
+	if (map == "")
+	{
+		cout << "Please enter the MAP file name" << endl;
+		cin >> map_file;
+	}
+	else map_file = map;
+	if (ped == "")
+	{
+		cout << "Please enter the PED file name" << endl;
+		cin >> ped_file;
+	}
+	else ped_file = ped;
 	if ( !ALL_SNPS.setFile( map_file ) )
 	{
 		cerr << "WARNING:PEDIndividualsExtractor::getInput():cannot open map file" << endl;
 		valid_flag = false;
 		return;
 	}
-
 	stream.open( ped_file.c_str() );
 	if ( !stream )
 	{
@@ -86,33 +83,71 @@ void PEDIndividualsExtractor::loadIndividuals()
 		new_ind[1]->setOffset( stream.tellg() );
 		new_ind[0]->setID(famID + " " + ID + ".0" );
 		new_ind[1]->setID(famID + " " + ID + ".1" );
-		
 		//////////////////////////////////////////////////
-		if (VAR_WINDOW)
-		{	loadCompleteMarkerSet(new_ind);
-		}
+		loadCompleteMarkerSet(new_ind);
 		//////////////////////////////////////////////////
-
 		individualsP->addIndividual( new_ind[0] );
 		individualsP->addIndividual( new_ind[1] );
-		
 	} else
 	{
 		Individual* new_ind = new Individual();
-			
 		new_ind->setOffset(stream.tellg());
 		new_ind->setID(famID + " " + ID);
-		
 		//////////////////////////////////////////////////
-		if (VAR_WINDOW)
-			loadCompleteMarkerSet(&new_ind);
+		loadCompleteMarkerSet(&new_ind);
 		//////////////////////////////////////////////////
-		
 		individualsP->addIndividual(new_ind);
-		
 	}
-	
 }
+
+
+void PEDIndividualsExtractor::loadCompleteMarkerSet(Individual ** p)
+{
+	stream.seekg(p[0]->getOffset() + 4*ALL_SNPS.getROIStart().getMarkerNumber());
+
+	unsigned int maxsize = ALL_SNPS.currentSize();
+	vector<bool>* buffer[2];
+	buffer[0] = new vector<bool>(maxsize,false);
+	buffer[1] = new vector<bool>(maxsize,false);
+
+	for (unsigned int position = 0; position <  maxsize; position++)
+	{
+		for(int al=0;al<2;al++){						
+			stripWhitespace();
+			char marker = stream.peek();
+
+			if ( ALL_SNPS.mapNucleotideToBinary(marker,  position ) == 1 )
+				buffer[al]->at(position)=true;
+			else
+				buffer[al]->at(position)=false;
+			stream.get();
+		}
+	}
+	if(HAPLOID)	
+	{
+		p[0]->addMarkers(TRANS,buffer[0]);
+		p[1]->addMarkers(TRANS,buffer[1]);	
+	}
+	else
+	{
+		p[0]->addMarkers(UNTRANS,buffer[0]);
+		p[0]->addMarkers(TRANS, buffer[1]);
+	}
+	delete buffer[0];
+	delete buffer[1];
+}
+
+void PEDIndividualsExtractor::updateMarkerSet(Individual * p,unsigned int start,unsigned int end)
+{
+	p->updateMarkerSet(start,end);
+}
+
+void PEDIndividualsExtractor::appendMarkerSet(Individual * p,unsigned int end, int num_markers)
+{
+	p->appendMarkerSet(end,num_markers);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
 
 //:TO BE OMITTED
 void PEDIndividualsExtractor::getCompleteMarkerSet(Individual * p)
@@ -121,6 +156,9 @@ void PEDIndividualsExtractor::getCompleteMarkerSet(Individual * p)
 	MarkerSet * ms[2];
 	ms[0] = new MarkerSet();
 	ms[1] = new MarkerSet();
+
+//Memorytally  
+mem_markers += (2*(sizeof(MarkerSet) + (ms[0]->getMarkerBits().num_blocks() * sizeof(unsigned long))));
 
 	readMarkerSet( ms );
 
@@ -160,43 +198,6 @@ void PEDIndividualsExtractor::getCompleteMarkerSet(Individual * p0 , Individual 
 }
 
 
-/////////////////////////////////////////////////////////////////////////////////////
-
-void PEDIndividualsExtractor::loadCompleteMarkerSet(Individual ** p)
-{
-	stream.seekg(p[0]->getOffset()); 
-
-	unsigned int maxsize = ALL_SNPS.currentSize();
-	list<bool>* buffer[2];
-	buffer[0] = new list<bool>;
-	buffer[1] = new list<bool>;
-
-	for (unsigned int position = 0; position <  maxsize; position++)
-	{
-		for(int al=0;al<2;al++){						
-			stripWhitespace();
-			char marker = stream.peek();
-
-			if ( ALL_SNPS.mapNucleotideToBinary(marker,  position ) == 1 )
-				buffer[al]->push_back(true);			
-			else
-				buffer[al]->push_back(false);
-			stream.get();
-		}
-	}
-	if(HAPLOID)	
-	{
-		p[0]->addMarkers(TRANS,buffer[0]);
-		p[1]->addMarkers(TRANS,buffer[1]);	
-	}
-	else
-	{
-		p[0]->addMarkers(UNTRANS,buffer[0]);
-		p[0]->addMarkers(TRANS, buffer[1]);
-	}
-	
-}
-
 //:TOBE OMITTED
 void PEDIndividualsExtractor::loadMarkerSet( MarkerSet ** ms )
 {
@@ -217,15 +218,6 @@ void PEDIndividualsExtractor::loadMarkerSet( MarkerSet ** ms )
 	}
 }
 
-void PEDIndividualsExtractor::updateMarkerSet(Individual * p,unsigned int start,unsigned int end)
-{
-	p->updateMarkerSet(start,end);
-}
-
-void PEDIndividualsExtractor::updateMarkerSet(Individual * p,int num_markers)
-{
-	p->updateMarkerSet(num_markers);
-}
 
 
 // end PEDIndividualsExtractor.cpp

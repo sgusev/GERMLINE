@@ -64,23 +64,22 @@ public:
 	unsigned int getMarkerNumber();
 
 private:
-
 	// SNP ID 
 	string SNPID;
+	// chromosome number
+	string chr;
 	// physical position of SNP
 	long physPos;
 	// genetic distance position of SNP
 	float centimorgan;
-	// allele variant mapped to 0
-	char variant[2];
-	// chromosome number
-	string chr;
-	// have variants been set 1 == major, 2 == both
-	short varSet;
 	// frequency 
 	unsigned int count[2];
 	// marker number
 	unsigned int num;
+	// allele variant mapped to 0
+	char variant[2];
+	// have variants been set 1 == major, 2 == both
+	short varSet;
 };
 
 #endif

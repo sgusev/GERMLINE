@@ -53,7 +53,7 @@ void MarkerSet::set(int index , bool bit )
 //TODO: update to use WIndowSize instead of MARKER_SET_SIZE
 void MarkerSet::print(ostream& out, unsigned int start, unsigned int end)
 {
-	for(unsigned int i=start;i<end && (position_ms*MARKER_SET_SIZE)+i < ALL_SNPS.currentSize();i++)
+	for(int i=start;i<end && (position_ms*MARKER_SET_SIZE)+i < ALL_SNPS.currentSize();i++)
 	{
 		out << ALL_SNPS.getSNP(position_ms*MARKER_SET_SIZE + i).getVariant( markers[i] );
 	}

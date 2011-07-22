@@ -42,7 +42,7 @@ void HMIndividualsExtractor::loadInput()
 
 
 // getInput(): gets individuals from .haps file.
-void HMIndividualsExtractor::getInput()
+void HMIndividualsExtractor::getInput(string map, string ped)
 {
 
 	cout << "Please enter the _legend file name" << endl;
@@ -171,7 +171,7 @@ void HMIndividualsExtractor::updateMarkerSet(Individual * p,unsigned int start,u
 }
 
 
-void HMIndividualsExtractor::updateMarkerSet(Individual * p,int num_markers)
+void HMIndividualsExtractor::appendMarkerSet(Individual * p,unsigned int end, int num_markers)
 {
 	
 }

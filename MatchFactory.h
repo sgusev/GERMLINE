@@ -31,12 +31,11 @@ public:
 	void hash(Individual *);
 	void assertShares();
 
-	unsigned int calculateMem();
-
-	unsigned int Nchoose2(unsigned int);
+	unsigned long long calculateMem();
+	unsigned long long calculateMemData();
+	unsigned long long Nchoose2(unsigned int);
 
 private:
-
 	// stores data to check for matches
 	map < boost::dynamic_bitset<> , Share > segments;
 	map < boost::dynamic_bitset<> , Share >::iterator iter;

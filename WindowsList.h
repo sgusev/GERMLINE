@@ -49,14 +49,14 @@ public:
 
 	void clear();
 	void initialize(unsigned int);
-
 	void getNewWindowSize(unsigned int );
 	int updateWindowSize(unsigned int);
 
+	unsigned long long calculateMem();
 private:
-	vector<WindowInfo*> windows_list;
-	vector<WindowInfo*>::iterator it ;
-	unsigned int currentWindowPos;
+	vector<WindowInfo> windows_list;
+	vector<WindowInfo>::iterator it ;
+	int currentWindowPos;
 };
 
 

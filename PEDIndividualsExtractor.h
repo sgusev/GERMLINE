@@ -19,7 +19,7 @@ public:
 	// getInput(): gets input from .haps file
 	// Precondition: Input is a .ped file in a valid format
 	// Postcondition: inds points to individuals from .ped file
-    void getInput();
+    void getInput(string map, string ped);
 	void loadInput();
 	void getCompleteMarkerSet(Individual * p);
 	void getCompleteMarkerSet(Individual * p0 , Individual * p1 );
@@ -27,7 +27,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////
 	void loadCompleteMarkerSet(Individual ** p);    
 	void updateMarkerSet(Individual * p,unsigned int start,unsigned int end);
-	void updateMarkerSet(Individual * p,int );
+	void appendMarkerSet(Individual * p,unsigned int, int );
 
 private:
 
@@ -50,7 +50,7 @@ private:
 	NucleotideMap inp;
 
 	///////////////////////////////////////////////////////////////////////////////////
-	void loadIndividuals();		//should change name convention to loadIndividuals()
+	void loadIndividuals();	
 	void loadMarkerSet( MarkerSet ** );          
 	
 

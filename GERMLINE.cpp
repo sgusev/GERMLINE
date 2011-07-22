@@ -2,7 +2,7 @@
 
 #include "GERMLINE.h"
 #include <iostream>
-
+#include <math.h>
 
 using namespace std;
 
@@ -12,34 +12,37 @@ unsigned long num_matches;
 SNPs ALL_SNPS;
 Individuals ALL_SAMPLES;
 
-
 // GERMLINE(): default constructor
 GERMLINE::GERMLINE()
 {}
 
 // mine(): main function for GERMLINE
-void GERMLINE::mine( string params )
+void GERMLINE::mine( string params, string map, string ped,string outfile)
 {
 	PolymorphicIndividualsExtractor * pie = inputManager.getPie();
-	if (ROI) VAR_WINDOW = false;
-	inputManager.getIndividuals();
+	inputManager.getIndividuals(map, ped);
 	if ( ! pie->valid() ) return;
 
-	//cout<<"MeM_BOUND = "<<MEM_BOUND<<endl;
-	
-	//string out = "D:\\ColumbiaUniversity\\Project-Germline\\commit3.1\\GERMLINE\\test\\test_fixed_30_tweak";
-	string out = inputManager.getOutput();  
+	string out;
+	if (outfile == "")
+		out = inputManager.getOutput(); 
+	else
+		out = outfile;
 
 	num_samples = 0;						
 	num_matches = 0;
 
 	pie->loadInput();
 	MatchesBuilder mb( pie );
-
 	
+	unsigned long long init_mem = (unsigned long long)(mem_all_matches+mem_bufferchr+mem_chromosome+mem_ind+mem_inds+mem_matchfactory+mem_markers+mem_snps+mem_window);
+	mem_expected_data= mb.calculateMemData();
 
+	if ( (init_mem+mem_expected_data) < MEM_BOUND)
+	{
+	cerr<<"\n\n\tBeginning Analysis"<<endl;
+	
 	ofstream fout( ( out + ".log" ).c_str() );
-
 	fout << setw(65) << setfill('-') << ' ' << endl << setfill(' ');
 	fout << " Welcome to GERMLINE, a tool for detecting long segments shared" << endl;
 	fout << " by descent between pairs of individuals in near-linear time." << endl;
@@ -57,9 +60,8 @@ void GERMLINE::mine( string params )
 	fout << params << endl;
 	fout << setw(65) << setfill('-') << ' ' << endl << setfill(' ');
 	fout << setw(50) << left << "Minimum match length: " << MIN_MATCH_LEN << " cM" << endl;
-	if(VAR_WINDOW) fout << setw(50) << "Allowed mismatch: " << MAX_ERR_HOMp << "% " << MAX_ERR_HETp << "%"<<endl;
-	else fout << setw(50) << "Allowed mismatching bits: " << MAX_ERR_HOM << " " << MAX_ERR_HET << endl;
-	if (!VAR_WINDOW) fout << setw(50) << "Word size: " << MARKER_SET_SIZE << endl;
+	fout << setw(50) << "Allowed mismatch: " << MAX_ERR_HOMp << "% " << MAX_ERR_HETp << "%"<<endl;
+	fout << setw(50) << "Minimum Word size: " << MIN_WINDOW_SIZE << endl;
 	if ( ROI )
 		fout << setw(50) << "Target region: " << ALL_SNPS.getROIStart().getSNPID() << " - " << ALL_SNPS.getROIEnd().getSNPID() << endl;
 	else
@@ -69,35 +71,29 @@ void GERMLINE::mine( string params )
 	
 	if ( DEBUG ) cout << "DEBUG MODE ON" << endl;
 
-	//TODO: update to use Variable windows
 	if ( ROI )
 	{
 		ALL_SNPS.beginChromosome();
-		num_sets = (long)ceil((double)ALL_SNPS.currentSize()/(double)MARKER_SET_SIZE);
+		ALL_SNPS_CURRENT_SIZE = ALL_SNPS.currentSize();
 		mb.buildMatches();
+		if ( !SILENT ) cout << "\nMatches completed ... freeing memory" << endl;
 		ALL_SAMPLES.freeMatches();
 		ALL_SAMPLES.freeMarkers();
+		WINDOWS_LIST.clear();
 	}
 	else
-	{
+	{	
 		for ( ALL_SNPS.beginChromosome() ; ALL_SNPS.moreChromosome() ; ALL_SNPS.nextChromosome() )
 		{
-			
+			MAX_WINDOW_SIZE=0;
 			ALL_SNPS_CURRENT_SIZE = ALL_SNPS.currentSize();
-			if (!VAR_WINDOW)
-				num_sets = (long)ceil((double)ALL_SNPS.currentSize()/(double)MARKER_SET_SIZE);
-					
 			mb.buildMatches();
-			//cout<<"Num_Sets = "<<num_sets<<endl;
-			if ( !SILENT ) cout << "Matches completed ... freeing memory" << endl;
-
+			if ( !SILENT ) cout << "\nMatches completed ... freeing memory" << endl;
 			ALL_SAMPLES.freeMatches();
 			ALL_SAMPLES.freeMarkers();
-			if (VAR_WINDOW) WINDOWS_LIST.clear();
-		}
-		
+			WINDOWS_LIST.clear(); LAST_SET=false; 
+		}		
 	}
-
 	time( &timer[1] );
 
 	fout << setw(50) << "Total IBD segments: " << num_matches << endl;
@@ -105,7 +101,6 @@ void GERMLINE::mine( string params )
 	fout.close();
 	MATCH_FILE.close();
 
-	//TODO: update to use Variable windows
 	if ( BINARY_OUT )		
 	{
 		ofstream bmid_out( ( out + ".bmid" ).c_str() );
@@ -115,6 +110,11 @@ void GERMLINE::mine( string params )
 		ofstream bsid_out( ( out + ".bsid" ).c_str() );
 		ALL_SAMPLES.print( bsid_out );
 		bsid_out.close();
+	}}
+	else
+	{
+		cerr<<"\n\n\tNot enough memory to load data...Cannot begin analysis";
+		cerr<<"\n\tRequire atleast "<<ceil((float)(init_mem+mem_expected_data)/1048576)<<" Mb space"<<endl;
 	}
 }
 

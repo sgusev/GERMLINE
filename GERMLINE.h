@@ -25,7 +25,7 @@ public:
 	// Precondition: Input files are in standard formats.
 	// Postcondition: Matching chromosome segments have been
 	//  printed to matches.dat in a readable format.
-	void mine( string params );
+	void mine( string params, string map, string ped, string outfile );
 
 private:
 

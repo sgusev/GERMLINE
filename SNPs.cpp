@@ -120,14 +120,16 @@ void SNPs::loadGeneticDistanceMap(string f)
 	string in , rs , chr;
 	map< string , map< string , float > >::iterator chr_query;
 	float d;
-
+	unsigned long count=0;
 	while(!s_map.eof())
 	{
+		count++;
 		s_map >> chr >> rs >> d >> in;
 		if ( ( chr_query = cm_map.find( chr ) ) == cm_map.end() )
 			chr_query = cm_map.insert( make_pair( chr , map< string , float >() ) ).first;
 		chr_query->second.insert(make_pair(rs,d));
 	}
+	mem_snps+= (cm_map.size()* (sizeof(pair<string,map<string,float> >)+sizeof(map<string,float>)))+(count* sizeof(pair<string,float>));
 }
 
 // getSNP(): accessor for SNPS.
@@ -233,10 +235,6 @@ void SNPs::processMAPFile(){
 				}
 			}
 		}
-
-		//cout<<"Process Map file size " <<full_size <<" \t SNP ID "<< cur.getSNPID();
-		//char ch = getchar();
-		
 	}
 	setGeneticDistances();
 	s.close();
@@ -250,11 +248,12 @@ void SNPs::addSNP( SNP& new_snp )
 		vector<SNP> v; v.push_back( new_snp );
 		chr_list.push_back( genome.insert( make_pair( new_snp.getChr() , v ) ).first );
 		chromosome = genome.begin();
-
+		mem_snps+=(sizeof(vector<SNP>)+sizeof(SNP)+sizeof(pair<string,vector<SNP> >)+sizeof(map< string , vector<SNP> >::iterator)+(2*sizeof(void*)));
 	}
 	else
 	{
 		chromosome->second.push_back( new_snp );
+		mem_snps+=sizeof(SNP);
 	}
 }
 

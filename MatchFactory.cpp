@@ -2,10 +2,9 @@
 
 #include "MatchFactory.h"
 
-
 // MatchFactory(): default constructor
 MatchFactory::MatchFactory()
-{}
+{mem_matchfactory = sizeof(MatchFactory);}
 
 void MatchFactory::assertShares()
 {
@@ -23,6 +22,7 @@ int MatchFactory::size()
 // initialize(): initializes object
 void MatchFactory::initialize()
 {
+	mem_matchfactory = sizeof(MatchFactory);
 	segments.clear();
 }	
 void MatchFactory::hash( Individual * i )
@@ -32,15 +32,8 @@ void MatchFactory::hash( Individual * i )
 	if ( het == 0 || HAPLOID ) haps = 1;
 	else haps = 2;
 
-	if(VAR_WINDOW)
-	{
-		if ( ALLOW_HOM && het <= WINDOWS_LIST.err_hom(position_ms) + WINDOWS_LIST.err_het(position_ms) ) 
-		i->assertHomozygous();}
-	else
-	{
-		if ( ALLOW_HOM && het <= MAX_ERR_HOM + MAX_ERR_HET ) 
-		i->assertHomozygous();}
-
+	if ( ALLOW_HOM && het <= WINDOWS_LIST.err_hom(position_ms) + WINDOWS_LIST.err_het(position_ms) ) 
+		i->assertHomozygous();
 	if ( HOM_ONLY ) 
 		return;
 	
@@ -48,33 +41,56 @@ void MatchFactory::hash( Individual * i )
 	{
 		boost::dynamic_bitset<>& ms = i->getChromosome(c)->getMarkerSet()->getMarkerBits();
 		if ( (iter = segments.find( ms )) == segments.end() )
+		{
 			segments.insert( make_pair ( ms , Share( i ) ) );
+			mem_matchfactory+= sizeof(pair<boost::dynamic_bitset<>,Share>)
+							+(ms.num_blocks()*sizeof(unsigned long))
+							+sizeof(Share)
+							+(3*sizeof(Individual*));
+		}
 		else
+		{	
 			iter->second.add( i );
+			mem_matchfactory+= (3*sizeof(Individual*));
+		}
 	}
 }
 
-
-unsigned int MatchFactory::calculateMem()
+unsigned long long MatchFactory::calculateMemData()
 {
-  unsigned int mem=0, temp=0;
+	unsigned long long mem=0;
+	int num_windows=0;
+	if (num_sets<1)  
+	{
+		num_windows = ceil((float)ALL_SNPS.currentSize()/ MIN_WINDOW_SIZE);
+ 		MarkerSet ms = new MarkerSet(false);
+        for(int i=0; i<MIN_WINDOW_SIZE; i++)
+        	ms.pushback(true);
+		mem_one_markerset = (sizeof(MarkerSet) + (ms.getMarkerBits().num_blocks() * sizeof(boost::dynamic_bitset<>::block_type))) ;
+	}
+	else
+		num_windows = ceil((float)(ALL_SNPS.currentSize()- position_marker)/MIN_WINDOW_SIZE);
+	
+	mem+= (sizeof(WindowInfo) * num_windows );
+	mem+= ( num_samples * 2 * num_windows * mem_one_markerset);
+	return mem;
+}
+
+unsigned long long MatchFactory::calculateMem()
+{
+  unsigned long long mem=0;
   map < boost::dynamic_bitset<> , Share >::iterator it;
-  //cout<<"\nposition_ms= "<<position_ms<<"\t"<<"segments= "<<segments.size()<<"\twindow size= "<<segments.begin()->first.size();
   
   for( it=segments.begin(); it!=segments.end(); ++it)
-	  temp += (Nchoose2(it->second.size()) * sizeof(Match)) ;
-  
-  mem+=temp;
-  //cout<<"-- "<<mem<<" bytes";
-  return mem;
+	  mem += (unsigned long long )(Nchoose2(it->second.size()) * (sizeof(Match)+sizeof(pair<size_t,Match*>))) ;
+
+  return (unsigned long long) mem+mem_all_matches+mem_bufferchr+mem_chromosome+mem_ind+mem_inds+mem_matchfactory+mem_markers+mem_snps+mem_window;
 }
 
-unsigned int MatchFactory::Nchoose2(unsigned int num)
+unsigned long long  MatchFactory::Nchoose2(unsigned int num)
 {
 	if (num<2) return 0;
-	else return num* (num-1) / 2;
+	else return (unsigned long long) num* (num-1) / 2;
 }
-
-
 
 // end MatchFactory.cpp
